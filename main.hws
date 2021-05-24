@@ -1,7 +1,7 @@
 @APPTITLE "ShutdownGUI"
 @APPDESCRIPTION "Shutdown GUI countdown"
 @APPAUTHOR "Enrique Mecklenburg Serkovic"
-@APPVERSION "$VER: 0.2 (24.05.21)"
+@APPVERSION "$VER: 0.3 (24.05.21)"
 
 @REQUIRE "RapaGUI", {Link = True}
 
@@ -38,7 +38,24 @@ EndFunction
 
 InstallEventHandler({RapaGUI = p_EventFunc})
 
-moai.CreateApp(FileToString("gui.xml"))					;Create GUI from file
+;moai.CreateApp(FileToString("gui.xml"))					;Create GUI from file
+moai.CreateApp(
+[[<?xml version="1.0" encoding="utf-8"?>
+<application>
+	<window title="ShutdownGUI">
+		<vgroup>
+			<label align = "Left">Raspberry will shutdown in:</label>
+			<textview id = "Countdown" styled = "True" align = "center"></textview>
+			<hgroup>
+				<button id = "btn_Ok">Ok</button>
+				<button id = "btn_Cancel">Cancel</button>
+			</hgroup>
+		</vgroup>
+	</window>
+</application>
+]]
+)
+
 moai.Set("Countdown", "Text", timeLeft$)				;Display initial countdown time
 
 SetInterval(1, p_Countdown, 1000)						;Run countdown with 1 second interval
