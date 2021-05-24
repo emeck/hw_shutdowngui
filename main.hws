@@ -1,9 +1,10 @@
 @APPTITLE "ShutdownGUI"
 @APPDESCRIPTION "Shutdown GUI countdown"
 @APPAUTHOR "Enrique Mecklenburg Serkovic"
-@APPVERSION "$VER: 0.3 (24.05.21)"
+@APPVERSION "$VER: 0.4 (24.05.21)"
 
 @REQUIRE "RapaGUI", {Link = True}
+@DISPLAY {Width = 320, Height = 200, FillStyle = #FILLCOLOR, Color = #GRAY}
 
 timeLeft$ = "10"										;Countdown start
 
@@ -28,7 +29,10 @@ EndFunction
  *******************/
 Function p_CountDown()
 	timeLeft$ = timeLeft$ - 1							;Reduce countdown time
-	moai.Set("Countdown", "Text", timeLeft$)			;Display new time
+	SetDisplayAttributes({Color = #WHITE})				;Set display to white to clear old time
+	SetDisplayAttributes({Color = #GRAY})				;Reset display to gray
+	TextOut(#CENTER, #CENTER, timeLeft$)				;Display new time
+
 	If timeLeft$ = 0									;If countdown ends...
 		Execute("shutdown", "-h")						;Execute shutdown command with "-h" arg
 		End()											;End program
@@ -38,14 +42,13 @@ EndFunction
 
 InstallEventHandler({RapaGUI = p_EventFunc})
 
-;moai.CreateApp(FileToString("gui.xml"))					;Create GUI from file
-moai.CreateApp(
+moai.CreateApp(											;Create GUI from file
 [[<?xml version="1.0" encoding="utf-8"?>
 <application>
 	<window title="ShutdownGUI">
 		<vgroup>
 			<label align = "Left">Raspberry will shutdown in:</label>
-			<textview id = "Countdown" styled = "True" align = "center"></textview>
+			<hollywood display="1"/>
 			<hgroup>
 				<button id = "btn_Ok">Ok</button>
 				<button id = "btn_Cancel">Cancel</button>
@@ -56,7 +59,9 @@ moai.CreateApp(
 ]]
 )
 
-moai.Set("Countdown", "Text", timeLeft$)				;Display initial countdown time
+SetFont(#SANS,56)
+SetFontStyle(#ANTIALIAS)
+TextOut(#CENTER, #CENTER, timeLeft$)					;Display initial countdown time
 
 SetInterval(1, p_Countdown, 1000)						;Run countdown with 1 second interval
 
