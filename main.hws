@@ -1,0 +1,54 @@
+@APPTITLE "ShutdownGUI"
+@APPDESCRIPTION "Shutdown GUI countdown"
+@APPAUTHOR "Enrique Mecklenburg Serkovic"
+@APPVERSION "$VER: 0.1 (24.05.21)"
+
+@REQUIRE "RapaGUI"
+
+timeLeft$ = "10"
+
+Function p_EventFunc(msg)
+	Switch msg.Class
+		Case "Button":									;this is the only class for events, but just in case...
+			Switch msg.Attribute
+				Case "Pressed":
+					Switch msg.ID						;check which button was pressed
+						Case "btn_Ok":					;"Ok" button was pressed
+							End()
+						Case "btn_Cancel":				;"Cancel" button was pressed
+							End()
+					EndSwitch
+			EndSwitch
+	EndSwitch				
+EndFunction
+
+/*
+Function p_CountDown()
+	For i = 10 To 1 Step -1
+		moai.Set("Countdown", "Text", i)
+		WaitTimer(1, 1000)
+	Next
+	
+	moai.Set("Countdown", "Text", "Your Raspberry 400 will shutdown now!")
+	Wait(50)
+	StopTimer(1)
+	End()	
+EndFunction
+*/
+Function p_CountDown()
+	timeLeft$ = timeLeft$ - 1
+	moai.Set("Countdown", "Text", timeLeft$)
+	If timeLeft$ = 0 Then End()
+EndFunction
+
+
+InstallEventHandler({RapaGUI = p_EventFunc})
+
+moai.CreateApp(FileToString("gui.xml"))
+moai.Set("Countdown", "Text", timeLeft$)
+
+SetInterval(1, p_Countdown, 1000)
+
+Repeat
+	WaitEvent()
+Forever
