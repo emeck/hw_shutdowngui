@@ -1,26 +1,24 @@
 @APPTITLE "ShutdownGUI"
 @APPDESCRIPTION "Shutdown GUI countdown"
 @APPAUTHOR "Enrique Mecklenburg Serkovic"
-@APPVERSION "$VER: 0.4 (24.05.21)"
+@APPVERSION "$VER: 0.5 (24.05.21)"
 
 @REQUIRE "RapaGUI", {Link = True}
 @DISPLAY {Width = 320, Height = 200, FillStyle = #FILLCOLOR, Color = #GRAY}
 
-timeLeft$ = "10"										;Countdown start
+
+timeLeft$ = "10"									;Countdown start
 
 Function p_EventFunc(msg)
 	Switch msg.Class
-		Case "Button":									;this is the only class for events, but just in case...
-			Switch msg.Attribute
-				Case "Pressed":
-					Switch msg.ID						;check which button was pressed
-						Case "btn_Ok":					;"Ok" button was pressed
-							Execute("shutdown", "-h")	;Execute shutdown command with "-h" arg
-							End()						;End program
-						Case "btn_Cancel":				;"Cancel" button was pressed
-							End()						;End program and cancel shutdown
-					EndSwitch
+	Case "Button":									;This is the only class for events, but just in case...
+		Switch msg.Attribute
+		Case "Pressed":
+			Switch msg.ID							;Check which button was pressed
+			Case "btn_Cancel":						;"Cancel" button was pressed
+				End()								;End program and cancel shutdown
 			EndSwitch
+		EndSwitch
 	EndSwitch				
 EndFunction
 
@@ -28,21 +26,21 @@ EndFunction
  *  Main function  *
  *******************/
 Function p_CountDown()
-	timeLeft$ = timeLeft$ - 1							;Reduce countdown time
-	SetDisplayAttributes({Color = #WHITE})				;Set display to white to clear old time
-	SetDisplayAttributes({Color = #GRAY})				;Reset display to gray
-	TextOut(#CENTER, #CENTER, timeLeft$)				;Display new time
+	timeLeft$ = timeLeft$ - 1						;Reduce countdown time
+	Cls()											;Clear display
+	TextOut(#CENTER, #CENTER, timeLeft$)			;Display new time
 
-	If timeLeft$ = 0									;If countdown ends...
-		Execute("shutdown", "-h")						;Execute shutdown command with "-h" arg
-		End()											;End program
+	If timeLeft$ = 0								;If countdown ends...
+		Run("/opt/shutdowngui/myshutdown", "")		;Run myshutdown script without arguments
+		Wait(50)
+		End()										;End program
 	EndIf
 EndFunction
 
 
 InstallEventHandler({RapaGUI = p_EventFunc})
 
-moai.CreateApp(											;Create GUI from file
+moai.CreateApp(										;Create GUI from file
 [[<?xml version="1.0" encoding="utf-8"?>
 <application>
 	<window title="ShutdownGUI">
@@ -50,8 +48,9 @@ moai.CreateApp(											;Create GUI from file
 			<label align = "Left">Raspberry will shutdown in:</label>
 			<hollywood display="1"/>
 			<hgroup>
-				<button id = "btn_Ok">Ok</button>
+				<rectangle/>
 				<button id = "btn_Cancel">Cancel</button>
+				<rectangle/>
 			</hgroup>
 		</vgroup>
 	</window>
@@ -61,9 +60,9 @@ moai.CreateApp(											;Create GUI from file
 
 SetFont(#SANS,56)
 SetFontStyle(#ANTIALIAS)
-TextOut(#CENTER, #CENTER, timeLeft$)					;Display initial countdown time
+TextOut(#CENTER, #CENTER, timeLeft$)				;Display initial countdown time
 
-SetInterval(1, p_Countdown, 1000)						;Run countdown with 1 second interval
+SetInterval(1, p_Countdown, 1000)					;Run countdown with 1 second interval
 
 Repeat
 	WaitEvent()
